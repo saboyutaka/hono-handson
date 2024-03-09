@@ -1,9 +1,27 @@
-import { Hono } from 'hono'
+import { Hono } from "hono";
+import { graphqlServer } from "@hono/graphql-server";
+import { buildSchema } from "graphql";
 
-const app = new Hono()
+const schema = buildSchema(`
+type Query {
+  hello: String
+}
+`);
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
+const rootResolver = () => {
+  return {
+    hello: () => "Hello Hono!",
+  };
+};
 
-export default app
+const app = new Hono();
+
+app.get("/", (c) => {
+  return c.text("Hello Hono!");
+});
+
+app.use("/graphql", graphqlServer({
+  schema, rootResolver
+}));
+
+export default app;
